@@ -51,11 +51,10 @@ namespace NCL {
 			Quaternion	Conjugate() const;
 			void		CalculateW();	//builds 4th component when loading in shortened, 3 component quaternions
 
-
 			void RotateByWorldAngles(const Vector3 angles);
 
 			static Quaternion EulerAnglesToQuaternion(float pitch, float yaw, float roll);
-			static Quaternion AxisAngleToQuaterion(const Vector3& vector, float degrees);
+			static Quaternion AxisAngleToQuaternion(const Vector3& vector, float degrees);
 
 			Vector3 ToEuler() const;
 
@@ -65,7 +64,6 @@ namespace NCL {
 			static Quaternion FromMatrix(const Matrix3 &m);
 
 			static float Dot(const Quaternion &a, const Quaternion &b);
-
 
 			static Quaternion	Lerp(const Quaternion &from, const Quaternion &to, float by);
 			static Quaternion	Slerp(const Quaternion &from, const Quaternion &to, float by);
@@ -93,7 +91,7 @@ namespace NCL {
 				);
 			}
 
-			inline Vector3		operator *(const Vector3 &a)	const {
+			inline Vector3	operator *(const Vector3 &a)	const {
 				Vector3 uv, uuv;
 				Vector3 qvec(x, y, z);
 				uv = -Vector3::Cross(qvec, a);

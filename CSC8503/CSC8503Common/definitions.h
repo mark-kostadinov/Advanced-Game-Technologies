@@ -9,6 +9,8 @@
 //#define DEBUG_MODE
 
 extern bool renderQuadTreeMode;
+constexpr float robotDetectionRange = 700.0f;
+constexpr float robotSpeed = 350.0f;
 
 // Printing out function
 template <typename T>

@@ -4,20 +4,24 @@
 #include <thread>
 #include <atomic>
 
-namespace NCL {
-	namespace CSC8503 {
+namespace NCL
+{
+	namespace CSC8503
+	{
 		class GameObject;
-		class GameClient : public NetworkBase {
+		class GameClient : public NetworkBase
+		{
 		public:
 			GameClient();
 			~GameClient();
+
+			void UpdateClient();
 
 			bool Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum);
 
 			void SendPacket(GamePacket&  payload);
 
 		protected:
-			void UpdateClient();
 			void ThreadedUpdate();
 
 			ENetPeer*	netPeer;

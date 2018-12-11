@@ -58,6 +58,8 @@ namespace NCL {
 			farPlane = val;
 		}
 
+		void LookAt(Vector3& position);
+
 		//Builds a view matrix for the current camera variables, suitable for sending straight
 		//to a vertex shader (i.e it's already an 'inverse camera matrix').
 		Matrix4 BuildViewMatrix() const;
@@ -81,6 +83,7 @@ namespace NCL {
 
 		static Camera BuildPerspectiveCamera(const Vector3& pos, float pitch, float yaw, float fov, float near, float far);
 		static Camera BuildOrthoCamera(const Vector3& pos, float pitch, float yaw, float left, float right, float top, float bottom, float near, float far);
+
 	protected:
 		CameraType camType;
 

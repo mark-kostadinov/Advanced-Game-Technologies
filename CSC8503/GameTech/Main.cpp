@@ -54,9 +54,61 @@ void TestStateMachine()
 	delete testMachine;
 }
 
+class TestPacketReceiver : public PacketReceiver
+{
+public:
+	TestPacketReceiver(string name) { this->name = name; }
+	
+	void ReceivePacket(int type, GamePacket* payload, int source)
+	{
+		if (type == String)
+		{
+			StringPacket* realPacket = (StringPacket*)payload;
+			string msg = realPacket->GetStringFromData();
+			
+			std::cout << name << " received message: " << msg << std::endl;
+		}
+	}
+protected:
+	string name;
+};
+
 void TestNetworking()
 {
+	NetworkBase::Initialise();
+	
+	TestPacketReceiver serverReceiver("Server");
+	TestPacketReceiver clientReceiver1("Client 1");
+	TestPacketReceiver clientReceiver2("Client 2");
+	
+	int port = NetworkBase::GetDefaultPort();
+	
+	GameServer* server = new GameServer(port, 2);
+	GameClient* client1 = new GameClient();
+	GameClient* client2 = new GameClient();
+	
+	server->RegisterPacketHandler(String, &serverReceiver);
+	client1->RegisterPacketHandler(String, &clientReceiver1);
+	client2->RegisterPacketHandler(String, &clientReceiver2);
+	
+	bool canConnect1 = client1->Connect(127, 0, 0, 1, port);
+	bool canConnect2 = client2->Connect(127, 0, 0, 1, port);
+	
+	if (canConnect1 && canConnect2)
+	{
+		for (int i = 0; i < 10; ++i)
+		{
+			server->SendGlobalPacket(StringPacket("Server says hello! " + std::to_string(i)));
+			client1->SendPacket(StringPacket("Client 1 says hello! " + std::to_string(i)));
+			client2->SendPacket(StringPacket("Client 2 says hello! " + std::to_string(i)));
 
+			server->UpdateServer();
+			client1->UpdateClient();
+			client2->UpdateClient();
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+	}
 }
 
 vector<Vector3> testNodes;
@@ -87,10 +139,11 @@ void DisplayPathfinding()
 		Debug::DrawLine(a, b, Vector4(0, 1, 1, 1));
 	}
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main()
 {
-	Window* w = Window::CreateGameWindow("Totally original Golf game!", 1920, 1200, true);
+	Window* w = Window::CreateGameWindow("Totally original game of Golf!", 1200, 800, false);
 
 	if (!w->HasInitialised())
 		return -1;
@@ -102,7 +155,8 @@ int main()
 	w->ShowOSPointer(true);
 	w->LockMouseToWindow(true);
 
-	TutorialGame* g = new TutorialGame();
+	NetworkedGame* g = new NetworkedGame();
+	//TutorialGame* g = new TutorialGame();
 	g->SetScreenSize(w->GetScreenSize());
 
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE))
@@ -119,6 +173,7 @@ int main()
 
 		//DisplayPathfinding();
 
+		g->UpdateNetworking();
 		g->UpdateGame(dt);
 	}
 	Window::DestroyGameWindow();

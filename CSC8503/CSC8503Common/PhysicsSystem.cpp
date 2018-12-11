@@ -232,7 +232,10 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	physA->ApplyLinearImpulse(-fullImpulse);
 	physB->ApplyLinearImpulse(fullImpulse);
 
-	if (a.GetName() == "Moving Obstacle" || b.GetName() == "Moving Obstacle") // Prevent the moving platform from rotating
+	if (a.GetName() == "Moving Obstacle" || b.GetName() == "Moving Obstacle") // Prevent the moving platforms from rotating
+		return;
+
+	if (a.GetName() == "Robot" || b.GetName() == "Robot") // Prevent the Robot from rotating too
 		return;
 
 	physA->ApplyAngularImpulse(Vector3::Cross(relativeA, -fullImpulse));
@@ -286,7 +289,8 @@ void PhysicsSystem::BroadPhase()
 
 				broadphaseCollisions.insert(info);
 			}
-		}	});
+		}
+	});
 }
 
 /*

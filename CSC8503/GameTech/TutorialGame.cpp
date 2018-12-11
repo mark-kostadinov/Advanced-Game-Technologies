@@ -30,6 +30,8 @@ TutorialGame::TutorialGame()
 
 	renderMenu = false;
 	renderEndScene = false;
+	isPlayerInRange = false;
+	drawPathfindingLines = false;
 
 	Debug::SetRenderer(renderer);
 
@@ -133,8 +135,8 @@ void TutorialGame::UpdateGame(float dt)
 			Debug::Print("(G)ravity off", Vector2(10, 35));
 #endif //DEBUG_MODE
 
-		UpdatePathfinding();
-		UpdatePlayerObject();
+		UpdatePlayer();
+		UpdateRobot();
 
 		if (!movingObstacles.empty())
 		{
@@ -185,6 +187,8 @@ void TutorialGame::UpdateKeys()
 		ResetGame();
 	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_T))
 		renderQuadTreeMode = !renderQuadTreeMode;
+	if (Window::GetKeyboard()->KeyPressed(KEYBOARD_P))
+		drawPathfindingLines = !drawPathfindingLines;
 
 #ifdef DEBUG_MODE
 	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::KEYBOARD_G))
@@ -287,7 +291,7 @@ void TutorialGame::LoadLevel(NavigationGrid* levelGrid)
 				Vector3(levelGrid->GetNodeSize() * 2.0f, 0.5f, levelGrid->GetNodeSize() * 2.0f));
 			break;
 		case GridNode::ROBOT_NODE:
-			AddRobotToWorld(Vector3(currentGridNode->position.x, 0.0f, currentGridNode->position.z), Vector3(30.0f, 60.0f, 30.0f));
+			AddRobotToWorld(Vector3(currentGridNode->position.x, -30.0f, currentGridNode->position.z), Vector3(20.0f, 50.0f, 20.0f));
 			break;
 		case GridNode::SAND_NODE:
 			AddSandToWorld(Vector3(currentGridNode->position.x, -100.0f, currentGridNode->position.z),
@@ -653,7 +657,7 @@ void TutorialGame::InitGJKWorld()
 
 		if (i == 1)
 		{
-			cube->GetTransform().SetLocalOrientation(Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 90.0f));
+			cube->GetTransform().SetLocalOrientation(Quaternion::AxisAngleToQuaternion(Vector3(1, 0, 0), 90.0f));
 		}
 
 		cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
@@ -668,27 +672,27 @@ void TutorialGame::InitGJKWorld()
 
 void TutorialGame::BridgeConstraintTest()
 {
-	float sizeMultiplier = 1.0f;
+	Vector3 cubeSize = Vector3(8, 8, 8);
 
-	Vector3 cubeSize = Vector3(8, 8, 8) * sizeMultiplier;
+	float invCubeMass = 5.0f; // How heavy the middle pieces are
+	int numLinks = 10;
+	float maxDistance = 30.0f; // Constraint distance
+	float cubeDistance = 20.0f; // Distance between links
 
-	int numLinks = 5;
+	Vector3 startPos = Vector3(500, 500, 500);
 
-	GameObject* start = AddCubeToWorld(Vector3(0, 0, 0), cubeSize, 0);
-
-	GameObject* end = AddCubeToWorld(Vector3((numLinks + 2) * 20 * sizeMultiplier, 0, 0), cubeSize, 0);
-
+	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0), cubeSize, 0);
+	GameObject* end = AddCubeToWorld(startPos + Vector3((numLinks + 2) * cubeDistance, 0, 0), cubeSize, 0);
 	GameObject* previous = start;
 
 	for (int i = 0; i < numLinks; ++i)
 	{
-		GameObject* block = AddCubeToWorld(Vector3((i + 1) * 20 * sizeMultiplier, 0, 0), cubeSize, 10.0f);
-		PositionConstraint* constraint = new PositionConstraint(previous, block, 30.0f);
+		GameObject* block = AddCubeToWorld(startPos + Vector3((i + 1) * cubeDistance, 0, 0), cubeSize, invCubeMass);
+		PositionConstraint* constraint = new PositionConstraint(previous, block, maxDistance);
 		world->AddConstraint(constraint);
 		previous = block;
 	}
-
-	PositionConstraint* constraint = new PositionConstraint(previous, end, 30.0f);
+	PositionConstraint* constraint = new PositionConstraint(previous, end, maxDistance);
 	world->AddConstraint(constraint);
 }
 
@@ -725,7 +729,7 @@ void TutorialGame::SimpleAABBTest2()
 	GameObject* fallingCube = AddCubeToWorld(Vector3(8, 20, 0), dimensions, 10.0f);
 }
 
-void TutorialGame::UpdatePlayerObject()
+void TutorialGame::UpdatePlayer()
 {
 	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 50.0f;
 	// Some boundary constraints
@@ -745,12 +749,7 @@ void TutorialGame::UpdatePlayerObject()
 		{
 			// Move the camera to the ball if the player decides so
 			if (Window::GetKeyboard()->KeyPressed(KEYBOARD_B))
-			{
-				/// TODO
-				//float unitVec = (*it)->GetTransform().GetWorldOrientation().Dot();
-				//world->GetMainCamera()->SetPosition((*it)->GetTransform().GetWorldPosition() + Vector3(60.0f, 30.0f, 60.0f));
-				//world->GetMainCamera()->SetPitch((*it)->GetTransform().GetWorldOrientation());
-			}
+				world->GetMainCamera()->LookAt((*it)->GetTransform().GetWorldPosition());
 
 			// Push the player object
 			if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::MOUSE_LEFT))
@@ -801,6 +800,11 @@ void TutorialGame::UpdatePlayerObject()
 		ResetGame();
 }
 
+void TutorialGame::UpdateRobot()
+{
+	UpdatePathfinding();
+}
+
 void TutorialGame::UpdatePathfinding()
 {
 	if (gameState->GetLevel() == MAIN_MENU || gameState->GetLevel() == END_SCENE)
@@ -811,32 +815,89 @@ void TutorialGame::UpdatePathfinding()
 	world->GetObjectIterators(first, last);
 
 	NavigationPath outPath;
-	vector<Vector3> testNodes;
+	vector<Vector3> pathNodes;
 	Vector3 startPos;
 	Vector3 endPos;
 
 	for (auto it = first; it != last; ++it)
 	{
-		if ((*it)->GetName() == "Player")
+		if ((*it)->GetName() == "Robot")
+		{
 			startPos = (*it)->GetTransform().GetWorldPosition();
 
-		if ((*it)->GetName() == "Goal")
+			((Robot*)(*it))->SetPlayerInRange(isPlayerInRange);
+			((Robot*)(*it))->GetStateMachine()->Update();
+		}
+
+		if ((*it)->GetName() == "Player")
 			endPos = (*it)->GetTransform().GetWorldPosition();
 	}
 
+	CompareRobotAndPlayer(startPos, endPos);
+
 	NavigationGrid* currentLevel = levelGrids.at(gameState->GetLevel() - 1);
-	bool found = currentLevel->FindPath(startPos, endPos, outPath);
+	bool pathFound = currentLevel->FindPath(startPos, endPos, outPath);
+
 	Vector3 pos;
 	while (outPath.PopWaypoint(pos))
-		testNodes.push_back(pos);
+		pathNodes.push_back(pos);
 
-	// Display Pathfinding
-	for (int i = 1; i < (int)testNodes.size(); ++i)
+	MoveRobot(pathFound, pathNodes, first, last);
+
+	DisplayPathfinding(pathNodes);
+}
+
+void TutorialGame::MoveRobot(bool pathFound, vector<Vector3>& pathNodes, vector<GameObject*>::const_iterator& first, vector<GameObject*>::const_iterator& last)
+{
+	if (pathFound) // If a path to the ball is found
 	{
-		Vector3 a = testNodes[i - 1];
-		Vector3 b = testNodes[i];
+		for (auto it = first; it != last; ++it) // Find the Robot again
+		{
+			if ((*it)->GetName() == "Robot")
+			{
+				// And if its state is right (i.e. The ball is inside its detection range)
+				if (((Robot*)(*it))->GetStateMachine()->GetActiveState()->GetName() == "Chase") 
+				{
+					if (!pathNodes.empty() && (*it)->GetTransform().GetWorldPosition().x != 0.0f)
+					{
+						Vector3 currentPos = (*it)->GetTransform().GetWorldPosition();
+						Vector3 nextPos;
 
-		Debug::DrawLine(a, b, Vector4(0, 1, 0.5f, 1));
+						if (pathNodes.size() >= 2) // Baka -_-
+							nextPos = pathNodes.at(1);
+						else
+							nextPos = Vector3(0, 0, 0);
+						Vector3 directionVector = Vector3(nextPos.x - currentPos.x, 0.0f, nextPos.z - currentPos.z);
+						directionVector.Normalise();
+
+						(*it)->GetPhysicsObject()->ApplyLinearImpulse(directionVector * robotSpeed);
+					}
+					break;
+				}
+			}
+		}
+	}
+}
+
+void TutorialGame::CompareRobotAndPlayer(Vector3& robotPos, Vector3& playerPos)
+{
+	Vector3 temp = robotPos - playerPos;
+	float distance = abs(temp.Length());
+	if (distance < robotDetectionRange)
+		isPlayerInRange = true;
+	else
+		isPlayerInRange = false;
+}
+
+void TutorialGame::DisplayPathfinding(vector<Vector3> & pathNodes)
+{
+	for (int i = 1; i < (int)pathNodes.size(); ++i)
+	{
+		Vector3 a = pathNodes[i - 1];
+		Vector3 b = pathNodes[i];
+
+		if (drawPathfindingLines)
+			Debug::DrawLine(a, b, Vector4(0, 1, 0.5f, 1));
 	}
 }
 

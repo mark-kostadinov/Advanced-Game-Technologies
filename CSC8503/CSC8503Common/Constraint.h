@@ -1,8 +1,11 @@
 #pragma once
 
-namespace NCL {
-	namespace CSC8503 {
-		class Constraint	{
+namespace NCL
+{
+	namespace CSC8503
+	{
+		class Constraint
+		{
 		public:
 			Constraint() {}
 			~Constraint() {}
@@ -10,4 +13,3 @@ namespace NCL {
 		};
 	}
 }
-

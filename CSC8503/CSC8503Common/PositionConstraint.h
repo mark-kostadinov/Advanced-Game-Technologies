@@ -1,8 +1,10 @@
 #pragma once
 #include "Constraint.h"
 
-namespace NCL {
-	namespace CSC8503 {
+namespace NCL
+{
+	namespace CSC8503
+	{
 		class GameObject;
 
 		class PositionConstraint : public Constraint
@@ -21,4 +23,3 @@ namespace NCL {
 		};
 	}
 }
-

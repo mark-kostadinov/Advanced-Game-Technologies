@@ -24,7 +24,8 @@ namespace NCL
 				object = obj;
 				this->pos = pos;
 				this->size = size;
-			}		};
+			}
+		};
 
 		template<class T>
 		class QuadTreeNode
@@ -164,7 +165,8 @@ namespace NCL
 
 			void OperateOnContents(typename QuadTreeNode<T>::QuadTreeFunc func)
 			{
-				root.OperateOnContents(func);			}
+				root.OperateOnContents(func);
+			}
 
 			void DebugDraw()
 			{

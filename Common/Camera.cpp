@@ -49,6 +49,18 @@ void Camera::UpdateCamera(float dt) {
 	}
 }
 
+void Camera::LookAt(Vector3 & position)
+{
+	Vector3 lookAt = position + Vector3(cos(pitch) * sin(yaw), sin(pitch), cos(pitch) * cos(yaw));
+
+	Vector3 directionVector = lookAt - position;
+	directionVector.Normalise();
+
+	SetPosition(lookAt + Vector3(0.0f, 30.0f, 120.0f));
+	SetPitch(asin(directionVector.y));
+	SetYaw(atan2(directionVector.x, directionVector.z));
+}
+
 /*
 Generates a view matrix for the camera's viewpoint. This matrix can be sent
 straight to the shader...it's already an 'inverse camera' matrix.

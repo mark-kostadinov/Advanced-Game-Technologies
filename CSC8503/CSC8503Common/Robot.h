@@ -1,13 +1,45 @@
 #pragma once
 
 #include "GameObject.h"
+#include "../CSC8503Common/StateMachine.h"
+#include "../CSC8503Common/StateTransition.h"
+#include "../CSC8503Common/State.h"
 
-class Robot : public NCL::CSC8503::GameObject
+namespace NCL
 {
-public:
-	Robot(string name = "Robot");
-	~Robot();
+	namespace CSC8503
+	{
+		class Robot : public GameObject
+		{
+		public:
+			Robot(string name = "Robot");
+			~Robot();
 
-	void OnCollisionBegin(GameObject* otherObject);
-	void OnCollisionEnd(GameObject* otherObject);
+			void OnCollisionBegin(GameObject* otherObject);
+			void OnCollisionEnd(GameObject* otherObject);
+
+			void InitialiseStates();
+			void InitialiseStateFunctions();
+			void InitialiseStateTransitions();
+
+			StateMachine* GetStateMachine() const { return stateMachine; }
+
+			bool IsPlayerInRange() const { return playerInRange; }
+			void SetPlayerInRange(bool b) { playerInRange = b; }
+
+		protected:
+			StateMachine* stateMachine;
+
+			GenericState* robotStateDefault;
+			GenericState* robotStateChase;
+
+			StateFunc Default;
+			StateFunc Chase;
+
+			GenericTransition<bool&, bool>* transitionDefaultToChase;
+			GenericTransition<bool&, bool>* transitionChaseToDefault;
+
+			bool playerInRange;
+		};
+	};
 };

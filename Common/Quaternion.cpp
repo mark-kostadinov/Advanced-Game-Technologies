@@ -101,7 +101,7 @@ Quaternion Quaternion::EulerAnglesToQuaternion(float roll, float yaw, float pitc
 	return q;
 };
 
-Quaternion Quaternion::AxisAngleToQuaterion(const Vector3& vector, float degrees)	{
+Quaternion Quaternion::AxisAngleToQuaternion(const Vector3& vector, float degrees)	{
 	float theta = (float)Maths::DegreesToRadians(degrees);
 	float result = (float)sin( theta / 2.0f );
 

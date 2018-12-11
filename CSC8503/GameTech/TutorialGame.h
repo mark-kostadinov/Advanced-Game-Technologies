@@ -16,6 +16,8 @@ namespace NCL {
 			virtual void UpdateGame(float dt);
 			void SetScreenSize(Vector2 screenSize) { this->screenSize = screenSize; }
 
+			GameWorld* GetGameWorld() const { return world; }
+
 		protected:
 			void InitialiseAssets();
 
@@ -44,8 +46,12 @@ namespace NCL {
 			void SimpleAABBTest();
 			void SimpleAABBTest2();
 
-			void UpdatePlayerObject();
+			void UpdatePlayer();
+			void UpdateRobot();
 			void UpdatePathfinding();
+			void MoveRobot(bool pathFound, vector<Vector3>& pathNodes, vector<GameObject*>::const_iterator& first, vector<GameObject*>::const_iterator& last);
+			void CompareRobotAndPlayer(Vector3& robotPos, Vector3& playerPos);
+			void DisplayPathfinding(vector<Vector3>& pathNodes);
 			void ResetScenes();
 
 			GameObject* AddFloorToWorld(const Vector3& position, const Vector3& dimensions, string name = "Floor", Vector4 colour = Vector4(1, 1, 1, 1));
@@ -62,7 +68,7 @@ namespace NCL {
 				string name = "Goal", Vector4 colour = Vector4(0.15f, 0.5f, 1, 1));
 			Player* AddPlayerToWorld(const Vector3& position, float radius = 14.0f, float inverseMass = 200.0f, string name = "Player",
 				Vector4 colour = Vector4(1, 1, 1, 1), bool isHollow = true);
-			Robot* AddRobotToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 0.5f,
+			Robot* AddRobotToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 0.005f,
 				string name = "Robot", Vector4 colour = Vector4(1, 1, 1, 1));
 			Sand* AddSandToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 0.0f,
 				string name = "Sand", Vector4 colour = Vector4(1, 1, 0.8f, 1));
@@ -76,10 +82,12 @@ namespace NCL {
 			bool useGravity;
 			bool renderMenu;
 			bool renderEndScene;
+			bool drawPathfindingLines;
 
 			float forceMagnitude;
 			Vector2	screenSize;
 			Vector4 hitCounterColour;
+			bool isPlayerInRange;
 
 			vector<MovingObstacle*>	movingObstacles;
 
