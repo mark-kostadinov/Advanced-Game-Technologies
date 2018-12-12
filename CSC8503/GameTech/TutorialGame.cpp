@@ -32,6 +32,7 @@ TutorialGame::TutorialGame()
 	renderEndScene = false;
 	isPlayerInRange = false;
 	drawPathfindingLines = false;
+	currentPlayerID = 1;
 
 	Debug::SetRenderer(renderer);
 
@@ -118,13 +119,13 @@ void TutorialGame::UpdateGame(float dt)
 
 	if (renderMenu)
 	{
-		Debug::Print("Press 1 for Level 1", Vector2(screenSize.x / 2.0f - 110.0f, screenSize.y / 2.0f));
-		Debug::Print("Press 2 for Level 2", Vector2(screenSize.x / 2.0f - 110.0f, screenSize.y / 2.0f - 40.0f));
+		renderer->DrawString("Press 1 for Level 1", Vector2(screenSize.x / 2.0f - 110.0f, screenSize.y / 2.0f));
+		renderer->DrawString("Press 2 for Level 2", Vector2(screenSize.x / 2.0f - 110.0f, screenSize.y / 2.0f - 40.0f));
 	}
 	if (renderEndScene)
 	{
-		Debug::Print("Congratulations, you won!", Vector2(screenSize.x / 2.0f - 170.0f, screenSize.y / 2.0f));
-		Debug::Print("Press M to go back to the Menu", Vector2(screenSize.x / 2.0f - 200.0f, screenSize.y / 2.0f - 40.0f));
+		renderer->DrawString("Congratulations, you won!", Vector2(screenSize.x / 2.0f - 170.0f, screenSize.y / 2.0f));
+		renderer->DrawString("Press M to go back to the Menu", Vector2(screenSize.x / 2.0f - 200.0f, screenSize.y / 2.0f - 40.0f));
 	}
 	else
 	{
@@ -269,6 +270,7 @@ void TutorialGame::LoadLevel(NavigationGrid* levelGrid)
 	AddWallToWorld(Vector3(780, -90, 1800), Vector3(800, 10, 20));
 	AddWallToWorld(Vector3(-40, -90, 780), Vector3(20, 10, 1040));
 	AddWallToWorld(Vector3(1600, -90, 780), Vector3(20, 10, 1040));
+	int numPlayers = 0;
 
 	for (int i = 0; i < levelGrid->GetGridSize(); i++)
 	{
@@ -281,7 +283,8 @@ void TutorialGame::LoadLevel(NavigationGrid* levelGrid)
 				Vector3((float)levelGrid->GetNodeSize(), levelGrid->GetNodeSize() * 3.0f, (float)levelGrid->GetNodeSize()));
 			break;
 		case GridNode::PLAYER_NODE:
-			AddPlayerToWorld(Vector3(currentGridNode->position.x, 0.0f, currentGridNode->position.z));
+			numPlayers++;
+			AddPlayerToWorld(numPlayers, Vector3(currentGridNode->position.x, 0.0f, currentGridNode->position.z));
 			break;
 		case GridNode::MOVING_OBSTACLE_NODE:
 			AddMovingObstacleToWorld(Vector3(currentGridNode->position.x, 0.0f, currentGridNode->position.z), Vector3(50.0f, 50.0f, 50.0f));
@@ -490,9 +493,9 @@ Goal* TutorialGame::AddGoalToWorld(const Vector3 & position, Vector3 dimensions,
 	return goalObject;
 }
 
-Player* TutorialGame::AddPlayerToWorld(const Vector3 & position, float radius, float inverseMass, string name, Vector4 colour, bool isHollow)
+Player* TutorialGame::AddPlayerToWorld(const int id, const Vector3 & position, float radius, float inverseMass, string name, Vector4 colour, bool isHollow)
 {
-	Player* playerObject = new Player(name);
+	Player* playerObject = new Player(id, name);
 
 	Vector3 playerSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
@@ -747,52 +750,60 @@ void TutorialGame::UpdatePlayer()
 	{
 		if ((*it)->GetName() == "Player")
 		{
-			// Move the camera to the ball if the player decides so
-			if (Window::GetKeyboard()->KeyPressed(KEYBOARD_B))
-				world->GetMainCamera()->LookAt((*it)->GetTransform().GetWorldPosition());
-
-			// Push the player object
-			if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::MOUSE_LEFT))
+			/// TODO: Networking
+			if (((Player*)(*it))->GetPlayerID() == currentPlayerID)
 			{
-				Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+				// Move the camera to the ball if the player decides so
+				if (Window::GetKeyboard()->KeyPressed(KEYBOARD_B))
+					world->GetMainCamera()->LookAt((*it)->GetTransform().GetWorldPosition());
 
-				RayCollision closestCollision;
-				if (world->Raycast(ray, closestCollision, true))
+				// If the ball is at "rest"-ish
+				if ((*it)->GetPhysicsObject()->GetLinearVelocity() < Vector3(10.0f, 10.0f, 10.0f))
 				{
-					if (!(*it)->GetPhysicsObject())
-						return;
-
-					if (closestCollision.node == (*it))
+					// Strike it!
+					if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::MOUSE_LEFT))
 					{
-						(*it)->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
-						((Player*)(*it))->SetHitCounter(((Player*)(*it))->GetHitCounter() + 1);
+						Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+
+						RayCollision closestCollision;
+						if (world->Raycast(ray, closestCollision, true))
+						{
+							if (!(*it)->GetPhysicsObject())
+								return;
+
+							if (closestCollision.node == (*it))
+							{
+								(*it)->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
+								((Player*)(*it))->SetHitCounter(((Player*)(*it))->GetHitCounter() + 1);
+							}
+						}
 					}
 				}
-			}
-			// Draw stuff related to the Player on screen
-			renderer->DrawString("Shooting Force: " + std::to_string((int)trunc(forceMagnitude)), Vector2(10, 10));
-			int hitCounter = (int)trunc(((Player*)(*it))->GetHitCounter());
-			DrawHitCounter(hitCounter);
+				// Draw stuff related to the Player on screen
+				renderer->DrawString("Shooting Force: " + std::to_string((int)trunc(forceMagnitude)), Vector2(10, 10));
+				int hitCounter = (int)trunc(((Player*)(*it))->GetHitCounter());
+				DrawHitCounter(hitCounter);
 
-			// If the player goes out of bounds, they die
-			if ((*it)->GetTransform().GetWorldPosition().y < -600.0f)
-				(*it)->Kill();
-			// If a player is dead, reset the game level
-			if (!(*it)->IsAlive())
-				resetGame = true;
-			// If the player finished a level, go to the next one (if there is one)
-			if (((Player*)(*it))->IsLevelCleared())
-			{
-				switch (gameState->GetLevel())
+				// If the player goes out of bounds, they die
+				if ((*it)->GetTransform().GetWorldPosition().y < -600.0f)
+					(*it)->Kill();
+				// If a player is dead, reset the game level
+				if (!(*it)->IsAlive())
+					resetGame = true;
+				// If the player finished a level, go to the next one (if there is one)
+				if (((Player*)(*it))->IsLevelCleared())
 				{
-				case LEVEL_1:
-					gameState->SetLevel(LEVEL_2);
-					break;
-				case LEVEL_2:
-					gameState->SetLevel(END_SCENE);
-					break;
+					switch (gameState->GetLevel())
+					{
+					case LEVEL_1:
+						gameState->SetLevel(LEVEL_2);
+						break;
+					case LEVEL_2:
+						gameState->SetLevel(END_SCENE);
+						break;
+					}
+					resetGame = true;
 				}
-				resetGame = true;
 			}
 		}
 	}
@@ -897,7 +908,7 @@ void TutorialGame::DisplayPathfinding(vector<Vector3> & pathNodes)
 		Vector3 b = pathNodes[i];
 
 		if (drawPathfindingLines)
-			Debug::DrawLine(a, b, Vector4(0, 1, 0.5f, 1));
+			renderer->DrawLine(a, b, Vector4(0, 1, 0.5f, 1));
 	}
 }
 

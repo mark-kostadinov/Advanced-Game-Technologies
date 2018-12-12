@@ -4,12 +4,19 @@
 #include <string>
 #include <iostream>
 
+#include "../../Common/Vector3.h"
+#include "../../Common/Quaternion.h"
+
+using namespace NCL;
+using namespace NCL::Maths;
+
 enum BasicNetworkMessages
 {
 	None,
 	Hello,
 	Message,
 	String,
+	Game_Data,
 	Delta_State,	//1 byte per channel since the last state
 	Full_State,		//Full transform etc
 	Received_State, //received from a client, informs that its received packet n
@@ -54,26 +61,55 @@ struct StringPacket : public GamePacket
 	}
 };
 
+struct GameDataPacket : public GamePacket
+{
+	int playerID;
+	int playerHits;
+	Vector3 playerPosition;
+	Quaternion playerOrientation;
+
+	GameDataPacket(const int id, int hits, const Vector3& position, const Quaternion& orientation)
+	{
+		type = BasicNetworkMessages::Game_Data;
+		playerID = id;
+		playerHits = hits;
+		playerPosition = position;
+		playerOrientation = orientation;
+		size = sizeof(int) + sizeof(int) + sizeof(Vector3) + sizeof(Quaternion);
+	};
+
+	int GetPlayerID() const { return playerID; }
+	int GetPlayerHits() const { return playerHits; }
+	Vector3 GetPlayerPosition() const { return playerPosition; }
+	Quaternion GetPlayerOrientation() const { return playerOrientation; }
+};
+
 struct NewPlayerPacket : public GamePacket
 {
 	int playerID;
+
 	NewPlayerPacket(int p)
 	{
 		type = BasicNetworkMessages::Player_Connected;
 		playerID = p;
 		size = sizeof(int);
 	}
+
+	int GetPlayerID() const { return playerID; }
 };
 
 struct PlayerDisconnectPacket : public GamePacket
 {
 	int playerID;
+
 	PlayerDisconnectPacket(int p)
 	{
 		type = BasicNetworkMessages::Player_Disconnected;
 		playerID = p;
 		size = sizeof(int);
 	}
+
+	int GetPlayerID() const { return playerID; }
 };
 
 class PacketReceiver

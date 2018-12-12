@@ -153,13 +153,13 @@ int main()
 	//TestPathfinding();
 
 	w->ShowOSPointer(true);
-	w->LockMouseToWindow(true);
+	w->LockMouseToWindow(false); // Edit the function to take in the parameter if you need a locked mouse -> it's bugged!
 
 	NetworkedGame* g = new NetworkedGame();
 	//TutorialGame* g = new TutorialGame();
 	g->SetScreenSize(w->GetScreenSize());
 
-	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE))
+	while (w->UpdateWindow() && !w->GetKeyboard()->KeyDown(KEYBOARD_ESCAPE))
 	{
 		float dt = w->GetTimer()->GetTimeDelta() / 1000.0f;
 

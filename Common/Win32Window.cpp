@@ -284,7 +284,7 @@ LRESULT CALLBACK Win32Window::WindowProc(HWND hWnd, UINT message, WPARAM wParam,
 }
 
 void	Win32Window::LockMouseToWindow(bool lock)	{
-	lockMouse = lock;
+	lockMouse = false;
 	if(lock) {
 		RECT		windowRect;
 		GetWindowRect (windowHandle, &windowRect);

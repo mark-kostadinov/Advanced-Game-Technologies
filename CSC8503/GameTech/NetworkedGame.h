@@ -20,7 +20,10 @@ namespace NCL
 			void UpdateNetworking();
 
 		protected:
-			ServerPacketReceiver* serverReceiver;
+			ServerPacketReceiver* serverStringReceiver;
+			ServerPacketReceiver* serverGameDataReceiver;
+			ServerPacketReceiver* serverConnectionReceiver;
+			ServerPacketReceiver* serverDisconnectionReceiver;
 			PlayerPacketReceiver* clientReceiver1;
 			PlayerPacketReceiver* clientReceiver2;
 			GameServer* server;
@@ -63,20 +66,39 @@ namespace NCL
 					string msg = realPacket->GetStringFromData();
 
 					std::cout << name << " received message: " << msg << std::endl;
+				}
 
-					/// TODO: Make a Highscore packet type
-					allHighScores.push_back(std::stoi(msg));
+				if (type == Player_Connected)
+				{
+					NewPlayerPacket* realPacket = (NewPlayerPacket*)payload;
+					int playerID = realPacket->GetPlayerID();
+				}
+
+				if (type == Player_Disconnected)
+				{
+					NewPlayerPacket* realPacket = (NewPlayerPacket*)payload;
+					int playerID = realPacket->GetPlayerID();
+				}
+
+				if (type == Game_Data)
+				{
+					GameDataPacket* realPacket = (GameDataPacket*)payload;
+					int playerID = realPacket->GetPlayerID();
+					int playerHits = realPacket->GetPlayerHits();
+					Vector3 playerPosition = realPacket->GetPlayerPosition();
+					Quaternion playerOrientation = realPacket->GetPlayerOrientation();
+
+					/// TODO: Send to the correct player?
+
+					allScores.push_back(playerHits);
 				}
 			}
 
-			void CalculateHighscore();
-			int GetHighScore() const { return highScore; }
+			int CalculateHighScore();
 
 		protected:
 			string name;
-
-			vector<int> allHighScores;
-			int highScore;
+			vector<int> allScores;
 		};
 	};
 };

@@ -2,6 +2,8 @@ c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\releas
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\pushdownmachine.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\positionconstraint.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\player.obj
+c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\physicssystem.obj
+c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\physicsobject.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\obstacle.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\networkobject.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\networkbase.obj
@@ -10,8 +12,13 @@ c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\releas
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\movingobstacle.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\gamestate.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\goal.obj
+c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\gjkalgorithm.obj
+c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\gameworld.obj
+c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\gameserver.obj
+c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\gameobject.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\gameclient.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\debug.obj
+c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\collisiondetection.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\transform.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\statetransition.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\statemachine.obj
@@ -22,13 +29,6 @@ c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\releas
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\renderobject.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\quadtree.obj
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\pushdownstate.obj
-c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\physicssystem.obj
-c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\physicsobject.obj
-c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\gjkalgorithm.obj
-c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\gameworld.obj
-c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\gameserver.obj
-c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\gameobject.obj
-c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\collisiondetection.obj
 c:\users\b5036861\github\advanced-game-technologies\win32\release\csc8503common.lib
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\csc8503common.tlog\cl.command.1.tlog
 c:\users\b5036861\github\advanced-game-technologies\csc8503\csc8503common\release\csc8503common.tlog\cl.read.1.tlog

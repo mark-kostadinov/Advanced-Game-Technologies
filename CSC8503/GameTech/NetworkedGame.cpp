@@ -6,23 +6,45 @@
 NetworkedGame::NetworkedGame()
 {
 	NetworkBase::Initialise();
+again:
+	std::cout << "Are you the first player? (y/n)" << std::endl;
+	char ans;
+	std::cin >> ans;
 
-	serverReceiver = new ServerPacketReceiver("Server");
-	clientReceiver1 = new PlayerPacketReceiver("Client 1");
-	clientReceiver2 = new PlayerPacketReceiver("Client 2");
+	if (ans == 'y')
+	{
+		serverStringReceiver = new ServerPacketReceiver("Server String Receiver");
+		serverGameDataReceiver = new ServerPacketReceiver("Server Game Data Receiver");
+		serverConnectionReceiver = new ServerPacketReceiver("Server Connection Receiver");
+		serverDisconnectionReceiver = new ServerPacketReceiver("Server Disconnection Receiver");
+		clientReceiver1 = new PlayerPacketReceiver("Client " + std::to_string(currentPlayerID));
 
-	port = NetworkBase::GetDefaultPort();
+		port = NetworkBase::GetDefaultPort();
+		server = new GameServer(port, 2);
+		client1 = new GameClient();
 
-	server = new GameServer(port, 2);
-	client1 = new GameClient();
-	client2 = new GameClient();
+		server->RegisterPacketHandler(String, serverStringReceiver);
+		server->RegisterPacketHandler(Game_Data, serverGameDataReceiver);
+		server->RegisterPacketHandler(Player_Connected, serverConnectionReceiver);
+		server->RegisterPacketHandler(Player_Disconnected, serverDisconnectionReceiver);
 
-	server->RegisterPacketHandler(String, serverReceiver);
-	client1->RegisterPacketHandler(String, clientReceiver1);
-	client2->RegisterPacketHandler(String, clientReceiver2);
+		client1->RegisterPacketHandler(String, clientReceiver1);
+		canConnect1 = client1->Connect(127, 0, 0, 1, port);
+		client1->SendPacket(NewPlayerPacket(currentPlayerID));
+	}
+	else if (ans == 'n')
+	{
+		std::cout << "Enter a player ID: " << std::endl;
+		std::cin >> currentPlayerID;
 
-	canConnect1 = client1->Connect(127, 0, 0, 1, port);
-	canConnect2 = client2->Connect(127, 0, 0, 1, port);
+		clientReceiver2 = new PlayerPacketReceiver("Client " + std::to_string(currentPlayerID));
+		client2 = new GameClient();
+		client2->RegisterPacketHandler(String, clientReceiver2);
+		canConnect2 = client2->Connect(127, 0, 0, 1, port);
+		client2->SendPacket(NewPlayerPacket(currentPlayerID));
+	}
+	else
+		goto again;
 }
 
 NetworkedGame::~NetworkedGame()
@@ -32,41 +54,64 @@ NetworkedGame::~NetworkedGame()
 
 void NetworkedGame::UpdateNetworking()
 {
-	//for (auto it = server->GetCurrentConnections().begin(); it != server->GetCurrentConnections().end(); it++)
-	//{
-	//	if ((*it)->incomingPeerID == 2)
-	//		server->SendPacketToPeer(2, StringPacket("We did it! " + std::to_string(i)));
-	//}
+	vector<GameObject*>::const_iterator first;
+	vector<GameObject*>::const_iterator last;
+	GetGameWorld()->GetObjectIterators(first, last);
+	vector<Player*> allPlayers;
+
+	for (auto it = first; it != last; ++it) // Get references to all of the players
+	{
+		if ((*it)->GetName() == "Player")
+			allPlayers.push_back((Player*)(*it));
+	}
 
 	if (canConnect1)
 	{
-		vector<GameObject*>::const_iterator first;
-		vector<GameObject*>::const_iterator last;
-		GetGameWorld()->GetObjectIterators(first, last);
-
-		for (auto it = first; it != last; ++it)
+		if (!allPlayers.empty())
 		{
-			if ((*it)->GetName() == "Player")
-				client1->SendPacket(StringPacket(std::to_string(((Player*)(*it))->GetHitCounter())));
+			int playerID = allPlayers.at(0)->GetPlayerID(); /// TODO
+			int playerHits = allPlayers.at(0)->GetHitCounter();
+			Vector3 playerPosition = allPlayers.at(0)->GetTransform().GetWorldPosition();
+			Quaternion playerOrientation = allPlayers.at(0)->GetTransform().GetWorldOrientation();
+
+			client1->SendPacket(GameDataPacket(playerID, playerHits, playerPosition, playerOrientation));
 		}
 		client1->UpdateClient();
 	}
 	if (canConnect2)
 	{
-		client2->SendPacket(StringPacket(std::to_string(5)));
+		/// TODO: Set the values to the opposite player from the server inside this function
+		//client2->SendPacket(GameDataPacket(2, 5, Vector3(), Quaternion()));
+
+		if (!allPlayers.empty())
+		{
+			int playerID = allPlayers.at(1)->GetPlayerID();
+			int playerHits = allPlayers.at(1)->GetHitCounter();
+			Vector3 playerPosition = allPlayers.at(1)->GetTransform().GetWorldPosition();
+			Quaternion playerOrientation = allPlayers.at(1)->GetTransform().GetWorldOrientation();
+
+			client2->SendPacket(GameDataPacket(playerID, playerHits, playerPosition, playerOrientation));
+		}
 		client2->UpdateClient();
 	}
 
-	server->UpdateServer();
-	serverReceiver->CalculateHighscore();
-	server->SetHighScore(serverReceiver->GetHighScore());
-	server->SendGlobalPacket(StringPacket("HS: " + std::to_string(server->GetHighScore())));
+	if (server)
+	{
+		server->UpdateServer();
+		server->SetHighScore(serverGameDataReceiver->CalculateHighScore());
+		server->SendGlobalPacket(StringPacket("High Score: " + std::to_string(server->GetHighScore())));
+	}
 }
 
-void NCL::CSC8503::ServerPacketReceiver::CalculateHighscore()
+int ServerPacketReceiver::CalculateHighScore()
 {
-	/// TODO: Add some checks pls
-	std::sort(allHighScores.at(0), allHighScores.at(1));
+	int hs = 0;
 
-	highScore = allHighScores.at(0);
+	if (!allScores.empty())
+	{
+		std::sort(allScores.begin(), allScores.end(), [](int const& a, int const& b) { return a < b; });
+		hs = allScores.at(0);
+		allScores.clear();
+	}
+	return hs;
 }

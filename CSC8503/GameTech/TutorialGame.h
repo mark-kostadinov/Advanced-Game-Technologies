@@ -66,7 +66,7 @@ namespace NCL {
 				string name = "Moving Obstacle", Vector4 colour = Vector4(1, 0, 0, 1));
 			Goal* AddGoalToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 0.0f,
 				string name = "Goal", Vector4 colour = Vector4(0.15f, 0.5f, 1, 1));
-			Player* AddPlayerToWorld(const Vector3& position, float radius = 14.0f, float inverseMass = 200.0f, string name = "Player",
+			Player* AddPlayerToWorld(const int id, const Vector3& position, float radius = 14.0f, float inverseMass = 200.0f, string name = "Player",
 				Vector4 colour = Vector4(1, 1, 1, 1), bool isHollow = true);
 			Robot* AddRobotToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 0.005f,
 				string name = "Robot", Vector4 colour = Vector4(1, 1, 1, 1));
@@ -88,6 +88,7 @@ namespace NCL {
 			Vector2	screenSize;
 			Vector4 hitCounterColour;
 			bool isPlayerInRange;
+			int currentPlayerID;
 
 			vector<MovingObstacle*>	movingObstacles;
 

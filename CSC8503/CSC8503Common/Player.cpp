@@ -1,7 +1,8 @@
 #include "Player.h"
 
-Player::Player(string playerName)
+Player::Player(int playerID, string playerName)
 {
+	id = playerID;
 	name = playerName;
 	isAlive = true;
 	isLevelCleared = false;
