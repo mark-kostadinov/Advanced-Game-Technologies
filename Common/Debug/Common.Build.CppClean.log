@@ -1,32 +1,32 @@
-c:\users\b5036861\github\advanced-game-technologies\common\debug\common.pdb
-c:\users\b5036861\github\advanced-game-technologies\common\debug\common.idb
-c:\users\b5036861\github\advanced-game-technologies\common\debug\win32mouse.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\win32keyboard.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\texturewriter.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\textureloader.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\texturebase.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\simplefont.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\shaderbase.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\rendererbase.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\quaternion.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\plane.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\mouse.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\meshgeometry.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\matrix4.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\matrix3.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\matrix2.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\maths.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\keyboard.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\gametimer.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\camera.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\assets.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\window.obj
-c:\users\b5036861\github\advanced-game-technologies\common\debug\win32window.obj
-c:\users\b5036861\github\advanced-game-technologies\win32\debug\common.lib
-c:\users\b5036861\github\advanced-game-technologies\win32\debug\common.pdb
-c:\users\b5036861\github\advanced-game-technologies\common\debug\common.tlog\cl.command.1.tlog
-c:\users\b5036861\github\advanced-game-technologies\common\debug\common.tlog\cl.read.1.tlog
-c:\users\b5036861\github\advanced-game-technologies\common\debug\common.tlog\cl.write.1.tlog
-c:\users\b5036861\github\advanced-game-technologies\common\debug\common.tlog\lib-link.read.1.tlog
-c:\users\b5036861\github\advanced-game-technologies\common\debug\common.tlog\lib-link.write.1.tlog
-c:\users\b5036861\github\advanced-game-technologies\common\debug\common.tlog\lib.command.1.tlog
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\common.pdb
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\common.idb
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\win32mouse.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\win32keyboard.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\texturewriter.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\textureloader.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\texturebase.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\simplefont.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\shaderbase.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\rendererbase.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\quaternion.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\plane.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\mouse.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\meshgeometry.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\matrix4.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\matrix3.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\matrix2.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\maths.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\keyboard.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\gametimer.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\camera.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\assets.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\window.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\win32window.obj
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\win32\debug\common.lib
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\win32\debug\common.pdb
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\common.tlog\cl.command.1.tlog
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\common.tlog\cl.read.1.tlog
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\common.tlog\cl.write.1.tlog
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\common.tlog\lib-link.read.1.tlog
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\common.tlog\lib-link.write.1.tlog
+c:\users\mark\desktop\uni\year 4\csc8503 advanced game technologies\advanced-game-technologies\common\debug\common.tlog\lib.command.1.tlog

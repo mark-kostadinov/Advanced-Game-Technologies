@@ -226,6 +226,14 @@ Ray CollisionDetection::BuildRayFromMouse(const Camera& cam)
 	return Ray(cam.GetPosition(), c);
 }
 
+Ray CollisionDetection::BuildRayFromCameraToArbitraryPosition(const Camera& cam, const Vector3& position)
+{
+	Vector3 direction = position;
+	direction.Normalise();
+
+	return Ray(cam.GetPosition(), direction);
+}
+
 Matrix4 CollisionDetection::GenerateInverseProjection(float aspect, float fov, float nearPlane, float farPlane)
 {
 	Matrix4 m;

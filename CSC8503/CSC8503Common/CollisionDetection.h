@@ -57,6 +57,7 @@ namespace NCL
 		};
 
 		static Ray BuildRayFromMouse(const Camera& c);
+		static Ray BuildRayFromCameraToArbitraryPosition(const Camera& cam, const Vector3& position);
 
 		static bool RayIntersection(const Ray&r, GameObject& object, RayCollision &collisions);
 

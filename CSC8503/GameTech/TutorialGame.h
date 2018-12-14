@@ -53,6 +53,7 @@ namespace NCL {
 			void CompareRobotAndPlayer(Vector3& robotPos, Vector3& playerPos);
 			void DisplayPathfinding(vector<Vector3>& pathNodes);
 			void ResetScenes();
+			void CalculateRayFromRobotToPlayer(vector<GameObject*>::const_iterator& first, vector<GameObject*>::const_iterator& last);
 
 			GameObject* AddFloorToWorld(const Vector3& position, const Vector3& dimensions, string name = "Floor", Vector4 colour = Vector4(1, 1, 1, 1));
 			GameObject* AddWallToWorld(const Vector3& position, const Vector3& dimensions, string name = "Wall", Vector4 colour = Vector4(1, 1, 1, 1));
@@ -88,7 +89,10 @@ namespace NCL {
 			Vector2	screenSize;
 			Vector4 hitCounterColour;
 			bool isPlayerInRange;
+			bool foundDirectPathToPlayer;
 			int currentPlayerID;
+			Vector3 currentPlayerPosition;
+			Vector3 currentRobotPosition;
 
 			vector<MovingObstacle*>	movingObstacles;
 

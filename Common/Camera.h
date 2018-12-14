@@ -58,7 +58,7 @@ namespace NCL {
 			farPlane = val;
 		}
 
-		void LookAt(Vector3& position);
+		void LookAt(Vector3& position, Vector3 offset = Vector3(0, 0, 0));
 
 		//Builds a view matrix for the current camera variables, suitable for sending straight
 		//to a vertex shader (i.e it's already an 'inverse camera matrix').

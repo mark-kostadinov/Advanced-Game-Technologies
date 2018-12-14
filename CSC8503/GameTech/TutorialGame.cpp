@@ -32,7 +32,10 @@ TutorialGame::TutorialGame()
 	renderEndScene = false;
 	isPlayerInRange = false;
 	drawPathfindingLines = false;
+	foundDirectPathToPlayer = false;
 	currentPlayerID = 1;
+	currentPlayerPosition = Vector3();
+	currentRobotPosition = Vector3();
 
 	Debug::SetRenderer(renderer);
 
@@ -42,13 +45,6 @@ TutorialGame::TutorialGame()
 	Window::GetWindow()->LockMouseToWindow(true);
 }
 
-/*
-
-Each of the little demo scenarios used in the game uses the same 2 meshes,
-and the same texture and shader. There's no need to ever load in anything else
-for this module, even in the coursework, but you can add it
-
-*/
 void TutorialGame::InitialiseAssets()
 {
 	cubeMesh = new OGLMesh("cube.msh");
@@ -72,9 +68,16 @@ void TutorialGame::InitialiseAssets()
 	renderer->EnableAnisotropicFiltering(*wallTex, renderer->largestSupportedAnisotropyLevel);
 	basicShader = new OGLShader("GameTechVert.glsl", "GameTechFrag.glsl");
 
-	levelGrids.push_back(new NavigationGrid("Level_1_Grid.txt"));
-	levelGrids.push_back(new NavigationGrid("Level_2_Grid.txt"));
-
+	if (isNetworkedGame)
+	{
+		levelGrids.push_back(new NavigationGrid("Level_1_Grid_NT.txt"));
+		levelGrids.push_back(new NavigationGrid("Level_2_Grid_NT.txt"));
+	}
+	else
+	{
+		levelGrids.push_back(new NavigationGrid("Level_1_Grid.txt"));
+		levelGrids.push_back(new NavigationGrid("Level_2_Grid.txt"));
+	}
 	InitCamera();
 	InitWorld();
 }
@@ -750,12 +753,11 @@ void TutorialGame::UpdatePlayer()
 	{
 		if ((*it)->GetName() == "Player")
 		{
-			/// TODO: Networking
 			if (((Player*)(*it))->GetPlayerID() == currentPlayerID)
 			{
 				// Move the camera to the ball if the player decides so
 				if (Window::GetKeyboard()->KeyPressed(KEYBOARD_B))
-					world->GetMainCamera()->LookAt((*it)->GetTransform().GetWorldPosition());
+					world->GetMainCamera()->LookAt((*it)->GetTransform().GetWorldPosition(), Vector3(0.0f, 30.0f, 120.0f));
 
 				// If the ball is at "rest"-ish
 				if ((*it)->GetPhysicsObject()->GetLinearVelocity() < Vector3(10.0f, 10.0f, 10.0f))
@@ -835,15 +837,21 @@ void TutorialGame::UpdatePathfinding()
 		if ((*it)->GetName() == "Robot")
 		{
 			startPos = (*it)->GetTransform().GetWorldPosition();
+			currentRobotPosition = startPos;
 
 			((Robot*)(*it))->SetPlayerInRange(isPlayerInRange);
 			((Robot*)(*it))->GetStateMachine()->Update();
 		}
 
 		if ((*it)->GetName() == "Player")
-			endPos = (*it)->GetTransform().GetWorldPosition();
+		{
+			if (((Player*)(*it))->GetPlayerID() == currentPlayerID)
+			{
+				endPos = (*it)->GetTransform().GetWorldPosition();
+				currentPlayerPosition = endPos;
+			}
+		}
 	}
-
 	CompareRobotAndPlayer(startPos, endPos);
 
 	NavigationGrid* currentLevel = levelGrids.at(gameState->GetLevel() - 1);
@@ -860,13 +868,34 @@ void TutorialGame::UpdatePathfinding()
 
 void TutorialGame::MoveRobot(bool pathFound, vector<Vector3>& pathNodes, vector<GameObject*>::const_iterator& first, vector<GameObject*>::const_iterator& last)
 {
-	if (pathFound) // If a path to the ball is found
+	foundDirectPathToPlayer = false;
+
+	// Try to find a direct, visible path from the robot to the player
+	if (isPlayerInRange)
+		CalculateRayFromRobotToPlayer(first, last);
+
+	if (foundDirectPathToPlayer)
+	{
+		for (auto jt = first; jt != last; ++jt)
+		{
+			if ((*jt)->GetName() == "Robot")
+			{
+				Vector3 directionVector = currentPlayerPosition - currentRobotPosition;
+				directionVector.Normalise();
+
+				(*jt)->GetPhysicsObject()->ApplyLinearImpulse(directionVector * robotSpeed);
+				break;
+			}
+		}
+	}
+
+	if (pathFound && !foundDirectPathToPlayer) // If a path to the ball is found and it is not direct
 	{
 		for (auto it = first; it != last; ++it) // Find the Robot again
 		{
 			if ((*it)->GetName() == "Robot")
 			{
-				// And if its state is right (i.e. The ball is inside its detection range)
+				// And if its state is right (i.e. the ball is inside its detection range)
 				if (((Robot*)(*it))->GetStateMachine()->GetActiveState()->GetName() == "Chase") 
 				{
 					if (!pathNodes.empty() && (*it)->GetTransform().GetWorldPosition().x != 0.0f)
@@ -874,11 +903,13 @@ void TutorialGame::MoveRobot(bool pathFound, vector<Vector3>& pathNodes, vector<
 						Vector3 currentPos = (*it)->GetTransform().GetWorldPosition();
 						Vector3 nextPos;
 
-						if (pathNodes.size() >= 2) // Baka -_-
+						if (pathNodes.size() >= 3) // Baka -_-
+							nextPos = pathNodes.at(2);
+						else if (pathNodes.size() == 2)
 							nextPos = pathNodes.at(1);
 						else
-							nextPos = Vector3(0, 0, 0);
-						Vector3 directionVector = Vector3(nextPos.x - currentPos.x, 0.0f, nextPos.z - currentPos.z);
+							nextPos = pathNodes.at(0);
+						Vector3 directionVector = nextPos - currentPos;
 						directionVector.Normalise();
 
 						(*it)->GetPhysicsObject()->ApplyLinearImpulse(directionVector * robotSpeed);
@@ -916,4 +947,54 @@ void TutorialGame::ResetScenes()
 {
 	renderEndScene = false;
 	renderMenu = false;
+}
+
+void TutorialGame::CalculateRayFromRobotToPlayer(vector<GameObject*>::const_iterator& first, vector<GameObject*>::const_iterator& last)
+{
+	// Safety checks
+	if (currentRobotPosition == Vector3())
+		return;
+	if (currentPlayerPosition == Vector3())
+		return;
+
+	// Transform the camera
+	Vector3 tempCameraPosition = world->GetMainCamera()->GetPosition();
+	float tempCameraPitch = world->GetMainCamera()->GetPitch();
+	float tempCameraYaw = world->GetMainCamera()->GetYaw();
+
+	world->GetMainCamera()->SetPosition(currentRobotPosition - Vector3(0, 20, 0));
+	/// TODO: Some issues with rotation cause it to not work properly every time :/
+
+	Vector3 directionVector = world->GetMainCamera()->GetPosition() - currentPlayerPosition;
+	directionVector.Normalise();
+
+	world->GetMainCamera()->SetPitch(asin(directionVector.y));
+	world->GetMainCamera()->SetYaw(atan2(directionVector.x, directionVector.z));
+
+	// Build the ray
+	Ray ray = CollisionDetection::BuildRayFromCameraToArbitraryPosition(*world->GetMainCamera(), currentPlayerPosition);
+	if (drawPathfindingLines)
+		renderer->DrawLine(world->GetMainCamera()->GetPosition(), currentPlayerPosition, Vector4(1, 0, 0, 1));
+
+	for (auto it = first; it != last; ++it)
+	{
+		if ((*it)->GetName() == "Player")
+		{
+			RayCollision closestCollision;
+			if (world->Raycast(ray, closestCollision, true))
+			{
+				if (!(*it)->GetPhysicsObject())
+					return;
+
+				if (closestCollision.node == (*it))
+					foundDirectPathToPlayer = true;
+
+				//Debug::DrawLine(currentRobotPosition, closestCollision.collidedAt);
+			}
+		}
+	}
+	// Revert values to original
+	world->GetMainCamera()->SetPosition(tempCameraPosition);
+	world->GetMainCamera()->SetPitch(tempCameraPitch);
+	world->GetMainCamera()->SetYaw(tempCameraYaw);
 }

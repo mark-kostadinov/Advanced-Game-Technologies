@@ -148,6 +148,11 @@ namespace NCL
 				return Vector3(-x, -y, -z);
 			}
 
+			inline Vector3  operator*(float f) const
+			{
+				return Vector3(x * f, y * f, z * f);
+			}
+
 			inline bool operator<(const Vector3 &a) const
 			{
 				if (x < a.x && y < a.y && z < a.z)
@@ -206,11 +211,6 @@ namespace NCL
 			inline float& operator[](int i)
 			{
 				return array[i];
-			}
-
-			inline Vector3  operator*(const float a) const
-			{
-				return Vector3(x * a, y * a, z * a);
 			}
 
 			inline Vector3  operator*(const Vector3  &a) const

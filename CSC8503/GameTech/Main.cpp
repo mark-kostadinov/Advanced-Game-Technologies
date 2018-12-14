@@ -155,7 +155,7 @@ int main()
 	w->ShowOSPointer(true);
 	w->LockMouseToWindow(false); // Edit the function to take in the parameter if you need a locked mouse -> it's bugged!
 
-	NetworkedGame* g = new NetworkedGame();
+	NetworkedGame* g = new NetworkedGame(); // Set 'isNetworkedGame' in definitions.h
 	//TutorialGame* g = new TutorialGame();
 	g->SetScreenSize(w->GetScreenSize());
 

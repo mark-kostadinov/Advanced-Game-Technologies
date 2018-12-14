@@ -28,10 +28,11 @@ namespace NCL
 
 			bool SendGlobalMessage(int msgID);
 			bool SendGlobalPacket(GamePacket& packet);
-			//bool SendMessageToPeer(int peerID, int msgID);
-			//bool SendPacketToPeer(int peerID, GamePacket& packet);
+			bool SendPacketToPeer(int peerID, GameDataPacket& packet);
 
-			//vector<ENetPeer*> GetCurrentConnections() const { return currentConnections; }
+			int GetClientCount() const { return clientCount; }
+			void SetClientCount(int i) { clientCount = i; }
+
 			int GetHighScore() const { return highScore; }
 			void SetHighScore(int i) { highScore = i; }
 
@@ -44,7 +45,6 @@ namespace NCL
 			int			clientCount;
 			GameWorld*	gameWorld;
 
-			//vector<ENetPeer*> currentConnections;
 			int highScore;
 
 			std::atomic<bool> threadAlive;

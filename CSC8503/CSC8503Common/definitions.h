@@ -10,7 +10,8 @@
 
 extern bool renderQuadTreeMode;
 constexpr float robotDetectionRange = 700.0f;
-constexpr float robotSpeed = 350.0f;
+constexpr float robotSpeed = 200.0f;
+constexpr bool isNetworkedGame = true;
 
 // Printing out function
 template <typename T>

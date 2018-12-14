@@ -15,6 +15,7 @@ public:
 	void SetLevelCleared(bool b) { isLevelCleared = b; }
 
 	int GetPlayerID() const { return id; }
+	void SetPlayerID(int i) { id = i; }
 
 	int GetHitCounter() const { return hitCounter; }
 	void SetHitCounter(int i) { hitCounter = i; }
