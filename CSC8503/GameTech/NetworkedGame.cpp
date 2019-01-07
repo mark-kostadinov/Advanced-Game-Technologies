@@ -76,11 +76,6 @@ void NetworkedGame::UpdateNetworking()
 			Quaternion playerOrientation = allPlayers.at(0)->GetTransform().GetWorldOrientation();
 
 			client1->SendPacket(GameDataPacket(playerID, playerHits, playerPosition, playerOrientation));
-
-			/// TODO: Set the values of the opposite player from the server inside this function?
-			//allPlayers.at(1)->SetHitCounter(clientReceiver1->GetPlayerHits());
-			//allPlayers.at(1)->GetTransform().SetWorldPosition(clientReceiver1->GetPlayerPosition());
-			//allPlayers.at(1)->GetTransform().SetLocalOrientation(clientReceiver1->GetPlayerOrientation());
 		}
 		client1->UpdateClient();
 	}
@@ -94,11 +89,6 @@ void NetworkedGame::UpdateNetworking()
 			Quaternion playerOrientation = allPlayers.at(1)->GetTransform().GetWorldOrientation();
 
 			client2->SendPacket(GameDataPacket(playerID, playerHits, playerPosition, playerOrientation));
-
-			/// TODO: Set the values of the opposite player from the server inside this function?
-			//allPlayers.at(0)->SetHitCounter(clientReceiver2->GetPlayerHits());
-			//allPlayers.at(0)->GetTransform().SetWorldPosition(clientReceiver2->GetPlayerPosition());
-			//allPlayers.at(0)->GetTransform().SetLocalOrientation(clientReceiver2->GetPlayerOrientation());
 		}
 		client2->UpdateClient();
 	}

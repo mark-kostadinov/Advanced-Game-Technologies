@@ -63,7 +63,6 @@ bool GameServer::SendGlobalPacket(GamePacket& packet)
 	return true;
 }
 
-/// TODO
 bool GameServer::SendPacketToPeer(int peerID, GameDataPacket& packet)
 {
 	ENetPacket* dataPacket = enet_packet_create(&packet, packet.GetTotalSize(), 0);

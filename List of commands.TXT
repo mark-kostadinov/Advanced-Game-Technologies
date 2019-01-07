@@ -1,0 +1,9 @@
+
+Key bindings:
+--------------------------------------------------------------------------------------------------
+	- When inside the Menu, press [1] or [2] to select a level;
+	- [R] resets each level;
+	- [B] moves to the position of the ball with it in the center of the screen;
+	- [T] toggles the Quad tree debug mode;
+	- [P] toggles the Pathfinding debug mode (and a ray from the robot to the player on level 2);
+	- When inside each of the Levels or the Victory screen, press [M] to go back to the Menu.
